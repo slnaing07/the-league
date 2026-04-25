@@ -10,7 +10,7 @@ const LOCAL_CHROME_PATHS = [
   '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
 ];
 
-async function getLaunchOptions(): Promise<{ executablePath: string; args: string[]; headless: boolean | 'new' }> {
+async function getLaunchOptions(): Promise<{ executablePath: string; args: string[] }> {
   const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
   if (isServerless) {
@@ -18,7 +18,6 @@ async function getLaunchOptions(): Promise<{ executablePath: string; args: strin
     return {
       executablePath: await chromium.executablePath(),
       args: chromium.args,
-      headless: true,
     };
   }
 
@@ -27,7 +26,6 @@ async function getLaunchOptions(): Promise<{ executablePath: string; args: strin
   return {
     executablePath,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: true,
   };
 }
 
@@ -75,7 +73,7 @@ export async function getFantraxBrowserSession(): Promise<string> {
     const browser = await puppeteer.launch({
       executablePath: launchOptions.executablePath,
       args: launchOptions.args,
-      headless: launchOptions.headless,
+      headless: true,
     });
 
     try {
