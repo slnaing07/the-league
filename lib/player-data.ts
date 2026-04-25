@@ -36,10 +36,16 @@ function parseFpts(val: string): number {
 }
 
 export async function getAllPlayerStats(): Promise<PlayerEntry[]> {
-  // Load season standings so we can map teamId → ownerName
-  const seasons = await getAllSeasons();
-  const teamOwner: Record<string, Record<string, string>> = {}; // year → teamId → ownerName
-  const teamName: Record<string, Record<string, string>> = {};  // year → teamId → teamName
+  // Fetch standings (for owner mapping) and all team rosters in parallel
+  const [seasons, ...rosterResults] = await Promise.all([
+    getAllSeasons(),
+    ...SEASONS.map(({ leagueId }) =>
+      fetchTeamRosters(leagueId).catch(() => null) as Promise<RostersResponse | null>
+    ),
+  ]);
+
+  const teamOwner: Record<string, Record<string, string>> = {};
+  const teamName: Record<string, Record<string, string>> = {};
   for (const s of seasons) {
     teamOwner[s.year] = {};
     teamName[s.year] = {};
@@ -52,15 +58,9 @@ export async function getAllPlayerStats(): Promise<PlayerEntry[]> {
   const allEntries: PlayerEntry[] = [];
 
   await Promise.allSettled(
-    SEASONS.map(async ({ year, leagueId }) => {
-      // Get all team IDs for this season
-      let teamIds: string[] = [];
-      try {
-        const rostersRaw = (await fetchTeamRosters(leagueId)) as RostersResponse;
-        teamIds = Object.keys(rostersRaw?.rosters ?? {});
-      } catch {
-        return;
-      }
+    SEASONS.map(async ({ year, leagueId }, idx) => {
+      const rostersRaw = rosterResults[idx];
+      const teamIds = Object.keys(rostersRaw?.rosters ?? {});
       if (!teamIds.length) return;
 
       // Batch-fetch roster stats for all teams in one POST
