@@ -20,9 +20,9 @@ export default async function DashboardPage() {
     <div className="space-y-10">
       {/* Hero */}
       <section>
-        <div className="flex items-end gap-4 mb-2">
-          <h1 className="text-4xl font-bold tracking-tight">The League</h1>
-          <span className="text-pitch-muted text-lg mb-1">7 seasons · {seasons.reduce((s, se) => s + se.standings.length, 0)} manager-seasons</span>
+        <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-4 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">The League</h1>
+          <span className="text-pitch-muted sm:text-lg sm:mb-1">7 seasons · {seasons.reduce((s, se) => s + se.standings.length, 0)} manager-seasons</span>
         </div>
         <p className="text-pitch-muted">Fantasy Soccer history from 2019 – 2025. All the glory, none of the mercy.</p>
       </section>

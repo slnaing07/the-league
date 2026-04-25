@@ -20,18 +20,18 @@ export default function StandingsTable({ standings, showOwner = true }: Props) {
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-pitch-card border-b border-pitch-border">
-            <th className="px-4 py-3 text-left text-pitch-muted font-medium w-10">#</th>
-            <th className="px-4 py-3 text-left text-pitch-muted font-medium">Team</th>
+            <th className="px-2 sm:px-4 py-3 text-left text-pitch-muted font-medium w-10">#</th>
+            <th className="px-2 sm:px-4 py-3 text-left text-pitch-muted font-medium">Team</th>
             {showOwner && (
-              <th className="px-4 py-3 text-left text-pitch-muted font-medium">Manager</th>
+              <th className="hidden sm:table-cell px-4 py-3 text-left text-pitch-muted font-medium">Manager</th>
             )}
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">W</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">L</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">T</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">PF</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">PA</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">+/-</th>
-            <th className="px-4 py-3 text-right text-pitch-muted font-medium">Win%</th>
+            <th className="px-2 sm:px-4 py-3 text-right text-pitch-muted font-medium">W</th>
+            <th className="px-2 sm:px-4 py-3 text-right text-pitch-muted font-medium">L</th>
+            <th className="hidden sm:table-cell px-4 py-3 text-right text-pitch-muted font-medium">T</th>
+            <th className="px-2 sm:px-4 py-3 text-right text-pitch-muted font-medium">PF</th>
+            <th className="hidden sm:table-cell px-4 py-3 text-right text-pitch-muted font-medium">PA</th>
+            <th className="hidden sm:table-cell px-4 py-3 text-right text-pitch-muted font-medium">+/-</th>
+            <th className="px-2 sm:px-4 py-3 text-right text-pitch-muted font-medium">Win%</th>
           </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@ export default function StandingsTable({ standings, showOwner = true }: Props) {
                   isFirst && 'bg-gold-500/5'
                 )}
               >
-                <td className="px-4 py-3">
+                <td className="px-2 sm:px-4 py-3">
                   <span
                     className={clsx(
                       'inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold',
@@ -61,22 +61,22 @@ export default function StandingsTable({ standings, showOwner = true }: Props) {
                     {team.rank || idx + 1}
                   </span>
                 </td>
-                <td className="px-4 py-3 font-medium">
+                <td className="px-2 sm:px-4 py-3 font-medium">
                   {isFirst && <span className="mr-1">🏆</span>}
                   {team.teamName}
                 </td>
                 {showOwner && (
-                  <td className="px-4 py-3 text-pitch-muted">{team.ownerName}</td>
+                  <td className="hidden sm:table-cell px-4 py-3 text-pitch-muted">{team.ownerName}</td>
                 )}
-                <td className="px-4 py-3 text-right text-emerald-400 font-semibold">{team.wins}</td>
-                <td className="px-4 py-3 text-right text-red-400">{team.losses}</td>
-                <td className="px-4 py-3 text-right text-pitch-muted">{team.ties}</td>
-                <td className="px-4 py-3 text-right">{team.pointsFor.toFixed(1)}</td>
-                <td className="px-4 py-3 text-right text-pitch-muted">{team.pointsAgainst.toFixed(1)}</td>
-                <td className={clsx('px-4 py-3 text-right font-medium', diff >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+                <td className="px-2 sm:px-4 py-3 text-right text-emerald-400 font-semibold">{team.wins}</td>
+                <td className="px-2 sm:px-4 py-3 text-right text-red-400">{team.losses}</td>
+                <td className="hidden sm:table-cell px-4 py-3 text-right text-pitch-muted">{team.ties}</td>
+                <td className="px-2 sm:px-4 py-3 text-right">{team.pointsFor.toFixed(1)}</td>
+                <td className="hidden sm:table-cell px-4 py-3 text-right text-pitch-muted">{team.pointsAgainst.toFixed(1)}</td>
+                <td className={clsx('hidden sm:table-cell px-4 py-3 text-right font-medium', diff >= 0 ? 'text-emerald-400' : 'text-red-400')}>
                   {diff >= 0 ? '+' : ''}{diff.toFixed(1)}
                 </td>
-                <td className="px-4 py-3 text-right text-pitch-muted">
+                <td className="px-2 sm:px-4 py-3 text-right text-pitch-muted">
                   {(team.winPct * 100).toFixed(1)}%
                 </td>
               </tr>

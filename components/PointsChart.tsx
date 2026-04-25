@@ -44,8 +44,9 @@ export default function PointsChart({ seasons: rawSeasons }: Props) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={360}>
-      <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+    <div className="h-56 sm:h-[360px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
         <XAxis dataKey="year" tick={{ fill: '#8b949e', fontSize: 12 }} />
         <YAxis tick={{ fill: '#8b949e', fontSize: 12 }} />
@@ -68,5 +69,6 @@ export default function PointsChart({ seasons: rawSeasons }: Props) {
         ))}
       </LineChart>
     </ResponsiveContainer>
+    </div>
   );
 }

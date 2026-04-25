@@ -68,7 +68,7 @@ export default function SeasonsPage() {
             </h2>
             <InProgressBadge year={selectedYear} />
             {season && (
-              <span className="text-pitch-muted text-sm ml-auto">
+              <span className="text-pitch-muted text-sm sm:ml-auto">
                 {season.standings.length} managers
               </span>
             )}

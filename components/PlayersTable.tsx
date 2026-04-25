@@ -46,7 +46,6 @@ function aggregate(entries: PlayerEntry[]): AggregatedPlayer[] {
       existing.seasons++;
       if (!existing.managers.includes(e.ownerName)) existing.managers.push(e.ownerName);
       existing.entries.push(e);
-      // Keep most recent EPL team
       existing.eplTeam = e.eplTeam || existing.eplTeam;
     }
   }
@@ -71,7 +70,7 @@ interface Props {
 
 export default function PlayersTable({ entries, managers, seasons }: Props) {
   const [selectedManager, setSelectedManager] = useState('');
-  const [selectedSeason, setSelectedSeason] = useState(0); // 0 = all
+  const [selectedSeason, setSelectedSeason] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>('fpts');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -109,7 +108,7 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
       <button
         onClick={() => setSortKey(k)}
         className={clsx(
-          'px-3 py-1 rounded text-xs font-medium transition-colors',
+          'px-3 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap',
           sortKey === k ? 'bg-emerald-500 text-black' : 'bg-pitch-card border border-pitch-border text-pitch-muted hover:text-white'
         )}
       >
@@ -121,12 +120,12 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
         {/* Season filter */}
         <select
           value={selectedSeason}
           onChange={e => { setSelectedSeason(Number(e.target.value)); setExpanded(null); }}
-          className="bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+          className="flex-1 sm:flex-none bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
         >
           <option value={0}>All seasons</option>
           {seasons.map(y => <option key={y} value={y}>{y}</option>)}
@@ -136,7 +135,7 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
         <select
           value={selectedManager}
           onChange={e => { setSelectedManager(e.target.value); setExpanded(null); }}
-          className="bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none min-w-44"
+          className="flex-1 sm:flex-none bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none sm:min-w-44"
         >
           <option value="">All managers</option>
           {managers.map(m => <option key={m} value={m}>{m}</option>)}
@@ -148,11 +147,11 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
           placeholder="Search player or team…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white placeholder:text-pitch-muted focus:border-emerald-500 focus:outline-none min-w-48"
+          className="w-full sm:w-auto sm:min-w-48 bg-pitch-card border border-pitch-border text-sm rounded-lg px-3 py-2 text-white placeholder:text-pitch-muted focus:border-emerald-500 focus:outline-none"
         />
 
         {/* Sort */}
-        <div className="flex gap-1.5 ml-auto">
+        <div className="flex gap-1.5 w-full sm:w-auto sm:ml-auto flex-wrap">
           <SortBtn k="fpts" label="Total FPts" />
           <SortBtn k="fptsPerGame" label="FPts/Game" />
           <SortBtn k="gamesPlayed" label="Games" />
@@ -172,15 +171,15 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-pitch-muted border-b border-pitch-border text-xs uppercase tracking-wider">
-              <th className="py-2 pr-4 w-6">#</th>
-              <th className="py-2 pr-4">Player</th>
-              <th className="py-2 pr-4">Pos</th>
-              <th className="py-2 pr-6">EPL Team</th>
-              <th className="py-2 pr-6 text-right">Total FPts</th>
-              <th className="py-2 pr-6 text-right">FPts/Game</th>
-              <th className="py-2 pr-6 text-right">Games</th>
-              <th className="py-2 text-right">Seasons</th>
-              {!selectedManager && <th className="py-2 pl-4">Managers</th>}
+              <th className="py-2 pr-3 w-6">#</th>
+              <th className="py-2 pr-3">Player</th>
+              <th className="py-2 pr-3">Pos</th>
+              <th className="hidden sm:table-cell py-2 pr-4">EPL Team</th>
+              <th className="py-2 pr-3 sm:pr-6 text-right">Total FPts</th>
+              <th className="hidden md:table-cell py-2 pr-6 text-right">FPts/Game</th>
+              <th className="hidden md:table-cell py-2 pr-6 text-right">Games</th>
+              <th className="hidden sm:table-cell py-2 text-right">Seasons</th>
+              {!selectedManager && <th className="hidden lg:table-cell py-2 pl-4">Managers</th>}
             </tr>
           </thead>
           <tbody>
@@ -194,24 +193,24 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
                     onClick={() => setExpanded(isExpanded ? null : p.playerId)}
                     className="border-b border-pitch-border/30 hover:bg-white/[0.02] cursor-pointer transition-colors"
                   >
-                    <td className="py-2.5 pr-4 text-pitch-muted tabular-nums">{i + 1}</td>
-                    <td className="py-2.5 pr-4 font-medium text-white whitespace-nowrap">{p.name}</td>
-                    <td className="py-2.5 pr-4">
+                    <td className="py-2.5 pr-3 text-pitch-muted tabular-nums">{i + 1}</td>
+                    <td className="py-2.5 pr-3 font-medium text-white whitespace-nowrap">{p.name}</td>
+                    <td className="py-2.5 pr-3">
                       <span className={clsx('text-xs font-bold px-1.5 py-0.5 rounded', posStyle)}>
                         {p.position}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-6 text-pitch-muted whitespace-nowrap">{p.eplTeam}</td>
-                    <td className="py-2.5 pr-6 text-right font-bold text-emerald-400 tabular-nums">
+                    <td className="hidden sm:table-cell py-2.5 pr-4 text-pitch-muted whitespace-nowrap">{p.eplTeam}</td>
+                    <td className="py-2.5 pr-3 sm:pr-6 text-right font-bold text-emerald-400 tabular-nums">
                       {p.totalFpts % 1 === 0 ? p.totalFpts : p.totalFpts.toFixed(2)}
                     </td>
-                    <td className="py-2.5 pr-6 text-right text-pitch-muted tabular-nums">
+                    <td className="hidden md:table-cell py-2.5 pr-6 text-right text-pitch-muted tabular-nums">
                       {p.fptsPerGame.toFixed(1)}
                     </td>
-                    <td className="py-2.5 pr-6 text-right text-pitch-muted tabular-nums">{p.totalGames}</td>
-                    <td className="py-2.5 text-right text-pitch-muted tabular-nums">{p.seasons}</td>
+                    <td className="hidden md:table-cell py-2.5 pr-6 text-right text-pitch-muted tabular-nums">{p.totalGames}</td>
+                    <td className="hidden sm:table-cell py-2.5 text-right text-pitch-muted tabular-nums">{p.seasons}</td>
                     {!selectedManager && (
-                      <td className="py-2.5 pl-4">
+                      <td className="hidden lg:table-cell py-2.5 pl-4">
                         <div className="flex flex-wrap gap-1">
                           {p.managers.map(m => (
                             <span key={m} className="text-xs bg-pitch-bg border border-pitch-border/50 rounded px-1.5 py-0.5 text-pitch-muted">
@@ -234,7 +233,7 @@ export default function PlayersTable({ entries, managers, seasons }: Props) {
                             {[...p.entries]
                               .sort((a, b) => b.year - a.year)
                               .map(e => (
-                                <div key={`${e.year}-${e.ownerName}`} className="bg-pitch-card border border-pitch-border/50 rounded-lg px-3 py-2 text-xs min-w-36">
+                                <div key={`${e.year}-${e.ownerName}`} className="bg-pitch-card border border-pitch-border/50 rounded-lg px-3 py-2 text-xs min-w-32">
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="text-gold-400 font-bold">{e.year}</span>
                                     <span className="text-emerald-400 font-bold tabular-nums">

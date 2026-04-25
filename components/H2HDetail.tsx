@@ -97,9 +97,9 @@ export default function H2HDetail({ seasons, owners }: Props) {
         <>
           {/* Summary banner */}
           <div className="card">
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <p className="text-xl font-bold">
+                <p className="text-lg sm:text-xl font-bold leading-tight">
                   <span className="text-emerald-400">{ownerA}</span>
                   <span className="text-pitch-muted mx-2">vs</span>
                   <span className="text-emerald-400">{ownerB}</span>
@@ -153,22 +153,23 @@ export default function H2HDetail({ seasons, owners }: Props) {
                         <div
                           key={`${m.year}-${m.period}`}
                           className={clsx(
-                            'grid grid-cols-[3rem_1fr_auto_1fr] items-center gap-2 rounded-lg px-3 py-2 text-sm',
+                            'flex items-center gap-2 rounded-lg px-3 py-2 text-sm',
                             m.result === 'a' ? 'bg-emerald-500/5' : m.result === 'b' ? 'bg-red-500/5' : 'bg-gold-500/5'
                           )}
                         >
-                          <span className="text-pitch-muted text-xs">GW{m.period}</span>
+                          {/* GW label */}
+                          <span className="text-pitch-muted text-xs shrink-0 w-9">GW{m.period}</span>
 
                           {/* Manager A side */}
-                          <div className="text-right">
-                            <span className={clsx('font-medium', m.result === 'a' ? 'text-white' : 'text-pitch-muted')}>
+                          <div className="flex-1 min-w-0 text-right">
+                            <span className={clsx('font-medium truncate block', m.result === 'a' ? 'text-white' : 'text-pitch-muted')}>
                               {m.aTeam}
                             </span>
-                            <span className="text-pitch-muted text-xs ml-1.5">({ownerA})</span>
+                            <span className="hidden sm:block text-pitch-muted text-xs">({ownerA})</span>
                           </div>
 
                           {/* Scoreline */}
-                          <div className="text-center whitespace-nowrap font-bold tabular-nums">
+                          <div className="shrink-0 text-center whitespace-nowrap font-bold tabular-nums px-1">
                             <span className={m.result === 'a' ? 'text-emerald-400' : m.result === 'tie' ? 'text-gold-400' : 'text-pitch-muted'}>
                               {m.aScore % 1 === 0 ? m.aScore : m.aScore.toFixed(2)}
                             </span>
@@ -179,11 +180,11 @@ export default function H2HDetail({ seasons, owners }: Props) {
                           </div>
 
                           {/* Manager B side */}
-                          <div>
-                            <span className="text-pitch-muted text-xs mr-1.5">({ownerB})</span>
-                            <span className={clsx('font-medium', m.result === 'b' ? 'text-white' : 'text-pitch-muted')}>
+                          <div className="flex-1 min-w-0">
+                            <span className={clsx('font-medium truncate block', m.result === 'b' ? 'text-white' : 'text-pitch-muted')}>
                               {m.bTeam}
                             </span>
+                            <span className="hidden sm:block text-pitch-muted text-xs">({ownerB})</span>
                           </div>
                         </div>
                       ))}
