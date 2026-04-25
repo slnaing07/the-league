@@ -18,7 +18,7 @@ async function getLaunchOptions(): Promise<{ executablePath: string; args: strin
     return {
       executablePath: await chromium.executablePath(),
       args: chromium.args,
-      headless: chromium.headless,
+      headless: true,
     };
   }
 
