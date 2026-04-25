@@ -4,15 +4,31 @@ import path from 'path';
 
 const COOKIE_FILE = path.join(process.cwd(), '.fantrax-session.json');
 
-// Common Chrome install locations on macOS
-const CHROME_PATHS = [
+const LOCAL_CHROME_PATHS = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/Applications/Chromium.app/Contents/MacOS/Chromium',
   '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
 ];
 
-function findChrome(): string | null {
-  return CHROME_PATHS.find(p => fs.existsSync(p)) ?? null;
+async function getLaunchOptions(): Promise<{ executablePath: string; args: string[]; headless: boolean | 'new' }> {
+  const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+  if (isServerless) {
+    const chromium = (await import('@sparticuz/chromium')).default;
+    return {
+      executablePath: await chromium.executablePath(),
+      args: chromium.args,
+      headless: chromium.headless,
+    };
+  }
+
+  const executablePath = LOCAL_CHROME_PATHS.find(p => fs.existsSync(p)) ?? null;
+  if (!executablePath) throw new Error('No local Chrome installation found');
+  return {
+    executablePath,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: true,
+  };
 }
 
 interface CachedSession {
@@ -30,8 +46,10 @@ function readCache(): string | null {
 }
 
 function writeCache(cookies: string): void {
-  const data: CachedSession = { cookies, expiry: Date.now() + 7 * 24 * 60 * 60 * 1000 };
-  fs.writeFileSync(COOKIE_FILE, JSON.stringify(data));
+  try {
+    const data: CachedSession = { cookies, expiry: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+    fs.writeFileSync(COOKIE_FILE, JSON.stringify(data));
+  } catch { /* ignore — serverless environments may not have a writable cwd */ }
 }
 
 let _inFlight: Promise<string> | null = null;
@@ -40,21 +58,24 @@ export async function getFantraxBrowserSession(): Promise<string> {
   const cached = readCache();
   if (cached) return cached;
 
-  // Deduplicate concurrent calls
   if (_inFlight) return _inFlight;
 
   _inFlight = (async () => {
-    const chromePath = findChrome();
-    if (!chromePath) return '';
-
     const username = process.env.FANTRAX_USERNAME;
     const password = process.env.FANTRAX_PASSWORD;
     if (!username || !password) return '';
 
+    let launchOptions;
+    try {
+      launchOptions = await getLaunchOptions();
+    } catch {
+      return '';
+    }
+
     const browser = await puppeteer.launch({
-      executablePath: chromePath,
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: launchOptions.executablePath,
+      args: launchOptions.args,
+      headless: launchOptions.headless,
     });
 
     try {
@@ -63,7 +84,6 @@ export async function getFantraxBrowserSession(): Promise<string> {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120'
       );
 
-      // Fantrax uses Angular Material — inputs render after JS executes
       await page.goto('https://www.fantrax.com/login', { waitUntil: 'load', timeout: 20000 });
       await page.waitForSelector('#mat-input-0', { timeout: 12000 });
 
@@ -74,7 +94,6 @@ export async function getFantraxBrowserSession(): Promise<string> {
       if (!submitBtn) return '';
       await submitBtn.click();
 
-      // Wait until we've navigated away from /login, then let WS session establish
       await page.waitForFunction(() => !window.location.href.includes('/login'), { timeout: 15000 });
       await new Promise(r => setTimeout(r, 2500));
 
